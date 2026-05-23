@@ -1,0 +1,177 @@
+/* ================================================================
+   TRACES — Global Styles
+   Design system tokens + base resets + keyframe animations
+   ================================================================ */
+
+:root {
+  --bg:             #0B0B0C;
+  --bg2:            #141416;
+  --bg3:            #1a1a1e;
+  --text:           #f0ece4;
+  --muted:          #7a7672;
+  --subtle:         #4a4846;
+  --faint:          #2a2826;
+  --accent-cream:   #c8bfaa;
+  --accent-green:   #2d4a3e;
+  --accent-navy:    #1c2a40;
+  --accent-burgundy:#3d1f24;
+  --glass:          rgba(255, 255, 255, 0.028);
+  --glass-border:   rgba(255, 255, 255, 0.07);
+  --glass-hover:    rgba(255, 255, 255, 0.048);
+  --serif:          'Cormorant Garamond', Georgia, serif;
+  --sans:           var(--font-inter), 'Inter', system-ui, sans-serif;
+  --radius:         20px;
+  --radius-sm:      12px;
+  --radius-xs:      8px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--bg);
+}
+
+::placeholder { color: var(--subtle); }
+
+::selection {
+  background: rgba(200, 191, 170, 0.18);
+  color: var(--text);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar         { width: 4px; }
+::-webkit-scrollbar-track   { background: transparent; }
+::-webkit-scrollbar-thumb   { background: rgba(255,255,255,0.07); border-radius: 2px; }
+
+/* ── Focus ── */
+:focus-visible {
+  outline: 1px solid rgba(200, 191, 170, 0.4);
+  outline-offset: 2px;
+}
+
+/* ── Keyframes ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes floatDrift {
+  0%, 100% { transform: translate(0, 0); }
+  50%       { transform: translate(4px, -8px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50%       { opacity: 1;   transform: scale(1.1); }
+}
+
+@keyframes ambientDrift1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(60px, 40px) scale(1.1); }
+}
+
+@keyframes ambientDrift2 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-50px, -30px) scale(0.95); }
+}
+
+@keyframes shimmer {
+  from { opacity: 0.3; }
+  to   { opacity: 0.65; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Utility classes ── */
+.animate-fade-up   { animation: fadeUp 0.55s ease both; }
+.animate-fade-in   { animation: fadeIn 0.35s ease both; }
+.animate-pulse     { animation: pulse 2.2s ease infinite; }
+
+.glass-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.serif { font-family: var(--serif); }
+.sans  { font-family: var(--sans); }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .landing-nav {
+    padding: 16px 16px !important;
+  }
+
+  .landing-hero {
+    padding: 72px 16px 48px !important;
+  }
+
+  .leave-trace-modal-actions {
+    flex-direction: column;
+  }
+
+  .leave-trace-modal-actions button,
+  .leave-trace-modal-actions a {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-floating-card {
+    display: none !important;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .delivery-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .onboarding-username-prefix {
+    display: none;
+  }
+
+  .onboarding-username-input {
+    padding-left: 14px !important;
+  }
+
+  .dashboard-nav {
+    padding: 14px 14px !important;
+  }
+
+  .profile-page {
+    padding: 56px 14px 40px !important;
+  }
+
+  .compose-flow {
+    padding: 56px 14px 40px !important;
+  }
+}

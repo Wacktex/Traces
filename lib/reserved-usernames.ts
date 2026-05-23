@@ -1,0 +1,40 @@
+/** Usernames that cannot be claimed (routes, brands, abuse). */
+export const RESERVED_USERNAMES = new Set([
+  'admin',
+  'administrator',
+  'api',
+  'app',
+  'auth',
+  'dashboard',
+  'help',
+  'login',
+  'logout',
+  'onboarding',
+  'privacy',
+  'profile',
+  'root',
+  'settings',
+  'sign-in',
+  'sign-up',
+  'signup',
+  'signin',
+  'support',
+  'terms',
+  'traces',
+  'trace',
+  'www',
+  'null',
+  'undefined',
+  'system',
+  'moderator',
+  'mod',
+  'staff',
+  'official',
+  'security',
+  'abuse',
+  'report',
+]);
+
+export function isReservedUsername(username: string): boolean {
+  return RESERVED_USERNAMES.has(username.toLowerCase());
+}
