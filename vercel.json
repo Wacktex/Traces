@@ -1,10 +1,4 @@
 {
-  /*"crons": [
-    {
-      "path": "/api/cron/unlock-capsules",
-      "schedule": "0 * * * *"
-    }
-  ],*/
   "headers": [
     {
       "source": "/api/(.*)",
