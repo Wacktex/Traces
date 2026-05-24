@@ -13,6 +13,7 @@ import { AmbientBg, SongCard }               from '@/components/shared';
 import { CATEGORIES }                        from '@/components/profile';
 import { actionReportTrace, actionBlockSender, actionOpenTrace } from '@/actions';
 import { track }                             from '@/lib/analytics';
+import { getEmotionalToneLabel, normalizeEmotionalTone } from '@/lib/emotional-tones';
 import type { TraceWithCapsule }             from '@/types';
 
 const REVEAL_LABELS: Record<string, string> = {
@@ -48,6 +49,8 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
   const [done,        setDone]        = useState<'reported' | 'blocked' | null>(null);
 
   const cat = CATEGORIES.find(c => c.id === trace.category);
+  const storedTone = normalizeEmotionalTone(trace.emotional_tone);
+  const toneLabel = storedTone ? getEmotionalToneLabel(storedTone) : null;
 
   const handleReport = async (reason: string) => {
     setReporting(true);
@@ -205,6 +208,11 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
           <span style={{ fontFamily: 'var(--sans)', fontSize: 11, color: '#6b6866', letterSpacing: '0.08em' }}>
             {REVEAL_LABELS[trace.reveal_type] ?? 'Anonymous'}
           </span>
+          {toneLabel && (
+            <span style={{ fontFamily: 'var(--sans)', fontSize: 11, color: '#6b6866', letterSpacing: '0.08em' }}>
+              Tone: {toneLabel}
+            </span>
+          )}
           <span style={{ fontFamily: 'var(--sans)', fontSize: 11, color: '#4a4846' }}>
             {formattedDate}
           </span>

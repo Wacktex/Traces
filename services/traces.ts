@@ -7,6 +7,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase-admin';
 import { runModerationPipeline } from './moderation';
 import { createNotification } from './notifications';
 import { deliveryRequiresDate, resolveDelivery } from '@/lib/delivery';
+import { normalizeEmotionalTone } from '@/lib/emotional-tones';
 import { withNormalizedCapsules } from '@/lib/time-capsules';
 import type {
   CreateTraceRequest,
@@ -93,6 +94,8 @@ export async function createTrace(
     status = 'delivered';
   }
 
+  const emotionalTone = normalizeEmotionalTone(request.emotionalTone);
+
   // 4. Insert trace
   const { data: trace, error: traceError } = await db
     .from('traces')
@@ -108,13 +111,17 @@ export async function createTrace(
       song_url: request.songUrl ?? null,
       song_note: request.songNote ?? null,
       clue: request.clue ?? null,
-      ...(request.emotionalTone ? { emotional_tone: request.emotionalTone } : {}),
+      emotional_tone: emotionalTone,
     })
-    .select('id')
+    .select('id, emotional_tone')
     .single();
 
   if (traceError || !trace) {
-    console.error('[trace_create]', traceError);
+    if (traceError?.message?.includes('emotional_tone')) {
+      console.error('[trace_create] Missing emotional_tone column — apply supabase/migrations/002_phase2_schema.sql');
+    } else {
+      console.error('[trace_create]', traceError);
+    }
     return { success: false, error: 'Something went wrong.' };
   }
 

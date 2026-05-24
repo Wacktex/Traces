@@ -44,7 +44,7 @@ export function identifyUser(userId: string, traits?: Record<string, unknown>) {
 type TraceEvent =
   | { event: 'profile_viewed'; props: { username: string } }
   | { event: 'trace_compose_started'; props: { category: string } }
-  | { event: 'trace_submitted'; props: { category: string; reveal_type: string; delivery_mode: string } }
+  | { event: 'trace_submitted'; props: { category: string; reveal_type: string; delivery_mode: string; emotional_tone: string } }
   | { event: 'trace_opened'; props: { category: string } }
   | { event: 'capsule_unlocked'; props: { condition: string } }
   | { event: 'dashboard_viewed'; props: { unopened_count: number } }

@@ -212,7 +212,7 @@ function StepOptions({
           <SectionLabel>Emotional tone</SectionLabel>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {EMOTIONAL_TONES.map(t => (
-              <button key={t.id} onClick={() => setEmotionalTone(t.id)} style={{
+              <button type="button" key={t.id} onClick={() => setEmotionalTone(t.id)} style={{
                 background: emotionalTone === t.id ? 'rgba(200,191,170,0.08)' : 'none',
                 border: `1px solid ${emotionalTone === t.id ? 'rgba(200,191,170,0.3)' : 'rgba(255,255,255,0.07)'}`,
                 borderRadius: 100, padding: '7px 14px', cursor: 'pointer',
@@ -432,7 +432,7 @@ export function ComposeFlow({ profile, initialCategory, onBack, onSubmitted }: C
         deliveryMode,
         customDate: deliveryMode === 'custom' ? customDate : undefined,
         milestoneDate: deliveryMode.startsWith('milestone_') ? milestoneDate : undefined,
-        emotionalTone: emotionalTone !== 'neutral' ? emotionalTone : undefined,
+        emotionalTone,
         clue:         clue || undefined,
         songUrl:      songUrl.trim() || undefined,
         songNote:     category === 'song_reminder' && content.trim() ? content.trim() : undefined,
@@ -446,7 +446,12 @@ export function ComposeFlow({ profile, initialCategory, onBack, onSubmitted }: C
         return;
       }
 
-      track('trace_submitted', { category, reveal_type: revealMode, delivery_mode: deliveryMode });
+      track('trace_submitted', {
+        category,
+        reveal_type: revealMode,
+        delivery_mode: deliveryMode,
+        emotional_tone: emotionalTone,
+      });
       setSuccessCopy(getSubmitSuccessCopy(deliveryMode, category));
       setStep(4);
       onSubmitted?.();
