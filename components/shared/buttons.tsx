@@ -5,6 +5,7 @@ import { type ButtonHTMLAttributes, type CSSProperties } from 'react';
 
 interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
+  className?: string;
 }
 
 interface BtnLinkProps {
@@ -15,43 +16,50 @@ interface BtnLinkProps {
 }
 
 const primaryStyles: CSSProperties = {
-  background: '#f0ece4',
-  color: '#0B0B0C',
+  background: 'var(--text)',
+  color: 'var(--bg)',
   border: 'none',
   borderRadius: 100,
-  padding: '12px 28px',
+  padding: '14px 28px',
+  minHeight: 'var(--touch-min)',
   cursor: 'pointer',
   fontFamily: 'var(--sans)',
-  fontSize: 13,
+  fontSize: 'var(--text-md)',
   fontWeight: 500,
   letterSpacing: '0.04em',
-  transition: 'opacity 0.2s, transform 0.2s',
+  transition: 'opacity 0.2s, transform 0.2s, box-shadow 0.2s',
   textDecoration: 'none',
-  display: 'inline-block',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   textAlign: 'center',
   boxSizing: 'border-box',
 };
 
 const ghostStyles: CSSProperties = {
-  background: 'none',
-  border: '1px solid rgba(255,255,255,0.1)',
+  background: 'var(--glass)',
+  border: '1px solid var(--glass-border)',
   borderRadius: 100,
-  padding: '12px 28px',
+  padding: '14px 28px',
+  minHeight: 'var(--touch-min)',
   cursor: 'pointer',
   fontFamily: 'var(--sans)',
-  fontSize: 13,
-  color: '#f0ece4',
+  fontSize: 'var(--text-md)',
+  color: 'var(--text)',
   letterSpacing: '0.04em',
-  transition: 'border-color 0.2s, transform 0.2s',
+  transition: 'border-color 0.2s, transform 0.2s, background 0.2s',
   textDecoration: 'none',
-  display: 'inline-block',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   textAlign: 'center',
   boxSizing: 'border-box',
 };
 
-export function BtnPrimary({ children, disabled, style, ...props }: BtnProps) {
+export function BtnPrimary({ children, disabled, style, className, ...props }: BtnProps) {
   return (
     <button
+      className={className}
       disabled={disabled}
       style={{
         ...primaryStyles,
@@ -73,15 +81,18 @@ export function BtnPrimary({ children, disabled, style, ...props }: BtnProps) {
   );
 }
 
-export function BtnGhost({ children, style, ...props }: BtnProps) {
+export function BtnGhost({ children, style, className, ...props }: BtnProps) {
   return (
     <button
+      className={className}
       style={{ ...ghostStyles, ...style }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.22)';
+        (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent-olive-border)';
+        (e.currentTarget as HTMLElement).style.background = 'var(--accent-olive-glass)';
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)';
+        (e.currentTarget as HTMLElement).style.borderColor = 'var(--glass-border)';
+        (e.currentTarget as HTMLElement).style.background = ghostStyles.background as string;
       }}
       {...props}
     >
@@ -90,10 +101,11 @@ export function BtnGhost({ children, style, ...props }: BtnProps) {
   );
 }
 
-export function BtnLink({ href, children, style }: BtnLinkProps) {
+export function BtnLink({ href, children, style, className }: BtnLinkProps) {
   return (
     <Link
       href={href}
+      className={className}
       style={{ ...primaryStyles, ...style }}
       onMouseEnter={(e) => {
         (e.currentTarget as HTMLElement).style.opacity = '0.84';
@@ -107,16 +119,19 @@ export function BtnLink({ href, children, style }: BtnLinkProps) {
   );
 }
 
-export function BtnGhostLink({ href, children, style }: BtnLinkProps) {
+export function BtnGhostLink({ href, children, style, className }: BtnLinkProps) {
   return (
     <Link
       href={href}
+      className={className}
       style={{ ...ghostStyles, ...style }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.22)';
+        (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent-olive-border)';
+        (e.currentTarget as HTMLElement).style.background = 'var(--accent-olive-glass)';
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)';
+        (e.currentTarget as HTMLElement).style.borderColor = 'var(--glass-border)';
+        (e.currentTarget as HTMLElement).style.background = ghostStyles.background as string;
       }}
     >
       {children}

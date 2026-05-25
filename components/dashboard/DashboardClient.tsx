@@ -41,8 +41,8 @@ function CapsuleCard({ capsule }: { capsule: { id: string; unlock_condition: str
   const labelText = formatCapsuleLabel(capsule.unlock_condition, capsule.unlock_date);
 
   return (
-    <div style={{
-      background: 'rgba(28,42,64,0.3)', border: '1px solid rgba(28,42,64,0.7)',
+    <div className="capsule-card" style={{
+      background: 'var(--accent-navy-glass)', border: '1px solid rgba(45,74,62,0.4)',
       borderRadius: 20, padding: '22px',
     }}>
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12 }}>
@@ -75,15 +75,15 @@ function CapsuleCard({ capsule }: { capsule: { id: string; unlock_condition: str
 function NotifPill({ notif }: { notif: Notification }) {
   const copy = notificationCopy(notif.type);
   return (
-    <div style={{
-      padding:    '10px 14px',
-      background: 'rgba(200,191,170,0.04)',
-      border:     '1px solid rgba(200,191,170,0.1)',
+    <div className="notif-pill" style={{
+      padding:    '12px 16px',
+      background: 'var(--accent-olive-glass)',
+      border:     '1px solid var(--accent-olive-border)',
       borderRadius: 12,
       animation:  'fadeIn 0.4s ease both',
     }}>
-      <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#c8bfaa', marginBottom: 2 }}>{copy.summary}</p>
-      {copy.body && <p style={{ fontFamily: 'var(--sans)', fontSize: 11, color: '#6b6866' }}>{copy.body}</p>}
+      <p style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-base)', color: 'var(--accent-cream)', marginBottom: 2 }}>{copy.summary}</p>
+      {copy.body && <p style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{copy.body}</p>}
     </div>
   );
 }
@@ -95,9 +95,9 @@ function TraceCard({ trace }: { trace: TraceWithCapsule }) {
 
   return (
     <Link href={`/traces/${trace.id}`} style={{ textDecoration: 'none', display: 'block' }}>
-      <div style={{
-        background:  'rgba(255,255,255,0.025)',
-        border:      '1px solid rgba(255,255,255,0.08)',
+      <div className="trace-card" style={{
+        background:  'var(--glass)',
+        border:      '1px solid var(--glass-border)',
         borderRadius: 20,
         padding:     '20px 22px',
         cursor:      'pointer',
@@ -156,7 +156,7 @@ function DashboardNav({ username, hasNew }: { username: string; hasNew: boolean 
       background:     'rgba(11,11,12,0.85)', backdropFilter: 'blur(12px)',
       borderBottom:   '1px solid rgba(255,255,255,0.05)',
     }}>
-      <span style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 300, letterSpacing: '0.14em', color: '#f0ece4' }}>traces</span>
+      <span className="nav-brand" style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 300, letterSpacing: '0.14em', color: 'var(--text)' }}>traces</span>
 
       <div style={{ display: 'flex', gap: 14, alignItems: 'center', position: 'relative' }}>
         {/* Notification indicator — subtle, no count */}
@@ -247,14 +247,14 @@ export function DashboardClient({ user, summary, initialNotifications }: Props) 
     <>
       <DashboardNav username={user.username} hasNew={hasNew} />
 
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '88px 20px 80px', position: 'relative', zIndex: 1 }}>
+      <div className="dashboard-page" style={{ maxWidth: 640, margin: '0 auto', padding: '88px 20px 80px', position: 'relative', zIndex: 1 }}>
 
         {/* Greeting */}
         <div style={{ marginBottom: 40, animation: 'fadeUp 0.5s ease both' }}>
-          <h1 style={{ fontFamily: 'var(--serif)', fontSize: 32, fontWeight: 300, color: '#f0ece4', marginBottom: 10 }}>
+          <h1 className="dash-greeting" style={{ fontFamily: 'var(--serif)', fontSize: 32, fontWeight: 300, color: 'var(--text)', marginBottom: 10 }}>
             {greeting}, {user.username}.
           </h1>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', fontFamily: 'var(--sans)', fontSize: 13, color: '#7a7672' }}>
+          <div className="dash-stat" style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', fontFamily: 'var(--sans)', fontSize: 'var(--text-md)', color: 'var(--muted)' }}>
             {summary.unopenedCount > 0 && (
               <span>{summary.unopenedCount} {summary.unopenedCount === 1 ? 'trace waits' : 'traces wait'}</span>
             )}
@@ -283,7 +283,7 @@ export function DashboardClient({ user, summary, initialNotifications }: Props) 
         {/* Traces */}
         {deliveredTraces.length > 0 && (
           <div style={{ marginBottom: 32 }}>
-            <p style={{ fontFamily: 'var(--sans)', fontSize: 9.5, letterSpacing: '0.2em', color: '#4a4846', textTransform: 'uppercase', marginBottom: 14 }}>
+            <p className="dash-section-label" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', letterSpacing: '0.2em', color: 'var(--subtle)', textTransform: 'uppercase', marginBottom: 14 }}>
               Waiting for you
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -299,7 +299,7 @@ export function DashboardClient({ user, summary, initialNotifications }: Props) 
         {/* Sealed / scheduled */}
         {sealedCapsules.length > 0 && (
           <div style={{ marginBottom: 32 }}>
-            <p style={{ fontFamily: 'var(--sans)', fontSize: 9.5, letterSpacing: '0.2em', color: '#4a4846', textTransform: 'uppercase', marginBottom: 14 }}>
+            <p className="dash-section-label" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', letterSpacing: '0.2em', color: 'var(--subtle)', textTransform: 'uppercase', marginBottom: 14 }}>
               Sealed for later
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

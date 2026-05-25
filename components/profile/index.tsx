@@ -37,13 +37,13 @@ export function CategoryGrid({ onSelect }: CategoryGridProps) {
     <div style={{ maxWidth: 860, margin: '0 auto', animation: 'fadeUp 0.5s ease 0.15s both' }}>
       {CATEGORY_GROUPS.map((group, gi) => (
         <div key={group.id} style={{ marginBottom: gi < CATEGORY_GROUPS.length - 1 ? 28 : 0 }}>
-          <p style={{
-            fontFamily: 'var(--sans)', fontSize: 9.5, letterSpacing: '0.18em',
-            color: '#5a5856', textTransform: 'uppercase', marginBottom: 6,
+          <p className="category-group-label" style={{
+            fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', letterSpacing: '0.18em',
+            color: 'var(--accent-olive-light)', textTransform: 'uppercase', marginBottom: 6,
           }}>
             {group.label}
           </p>
-          <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#4a4846', marginBottom: 12, lineHeight: 1.5 }}>
+          <p className="category-group-desc" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-base)', color: 'var(--subtle)', marginBottom: 12, lineHeight: 'var(--leading-normal)' }}>
             {group.description}
           </p>
           <div className="category-grid" style={{
@@ -56,10 +56,11 @@ export function CategoryGrid({ onSelect }: CategoryGridProps) {
               return (
                 <button
                   key={cat.id}
+                  className="category-card"
                   onClick={() => onSelect(cat.id as CategoryId)}
                   style={{
-                    background: 'rgba(255,255,255,0.025)',
-                    border: '1px solid rgba(255,255,255,0.07)',
+                    background: 'var(--glass)',
+                    border: '1px solid var(--glass-border)',
                     borderRadius: 18,
                     padding: '16px 14px',
                     cursor: 'pointer',
@@ -175,11 +176,11 @@ export function ProfilePageClient({ profile }: ProfilePageClientProps) {
 
       <ProfileHeader profile={profile} />
 
-      <p style={{
+      <p className="profile-prompt" style={{
         fontFamily: 'var(--serif)',
         fontStyle:  'italic',
-        fontSize:   18,
-        color:      '#c8bfaa',
+        fontSize:   'var(--text-xl)',
+        color:      'var(--accent-cream)',
         textAlign:  'center',
         maxWidth:   480,
         margin:     '0 auto 32px',

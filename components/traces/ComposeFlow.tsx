@@ -51,7 +51,7 @@ const dateInputStyle: React.CSSProperties = {
 // ── Section label ─────────────────────────────────────────────────
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontFamily: 'var(--sans)', fontSize: 10, letterSpacing: '0.18em', color: '#6b6866', textTransform: 'uppercase', marginBottom: 12 }}>
+    <p className="compose-label" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', letterSpacing: '0.18em', color: 'var(--accent-olive-light)', textTransform: 'uppercase', marginBottom: 12 }}>
       {children}
     </p>
   );

@@ -8,9 +8,9 @@ export async function LandingHeroCTAs() {
 
   return (
     <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-      <LeaveTraceTrigger style={{ padding: '13px 32px' }} />
+      <LeaveTraceTrigger className="btn-touch" />
       {!userId ? (
-        <BtnGhostLink href="/sign-up" style={{ padding: '13px 32px' }}>
+        <BtnGhostLink href="/sign-up" className="btn-touch">
           Create your profile
         </BtnGhostLink>
       ) : (
@@ -25,14 +25,14 @@ async function AuthenticatedSecondaryCta({ clerkId }: { clerkId: string }) {
 
   if (!user || !user.is_onboarded) {
     return (
-      <BtnGhostLink href="/onboarding" style={{ padding: '13px 32px' }}>
+      <BtnGhostLink href="/onboarding" className="btn-touch">
         Finish your profile
       </BtnGhostLink>
     );
   }
 
   return (
-    <BtnGhostLink href="/dashboard" style={{ padding: '13px 32px' }}>
+    <BtnGhostLink href="/dashboard" className="btn-touch">
       Your dashboard
     </BtnGhostLink>
   );

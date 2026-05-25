@@ -19,7 +19,7 @@ export default async function OnboardingPage() {
   if (user?.is_onboarded) redirect('/dashboard');
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0B0B0C', position: 'relative' }}>
+    <div className="onboarding-page" style={{ minHeight: '100vh', background: 'var(--bg)', position: 'relative' }}>
       <Grain />
       <OnboardingForm defaultUsername={user?.username ?? ''} />
     </div>

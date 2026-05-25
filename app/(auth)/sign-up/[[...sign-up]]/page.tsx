@@ -4,9 +4,10 @@ import { Grain } from '@/components/shared';
 export default function SignUpPage() {
   return (
     <div
+      className="auth-page"
       style={{
         minHeight: '100vh',
-        background: '#0B0B0C',
+        background: 'var(--bg)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -43,7 +44,7 @@ export default function SignUpPage() {
             colorDanger: '#a05050',
             borderRadius: '16px',
             fontFamily: 'Inter, sans-serif',
-            fontSize: '14px',
+            fontSize: '16px',
           },
           elements: {
             card: { boxShadow: 'none', border: '1px solid rgba(255,255,255,0.07)', background: '#141416' },

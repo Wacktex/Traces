@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BtnPrimary, BtnGhost } from '@/components/shared';
 
-export function LeaveTraceTrigger({ style }: { style?: React.CSSProperties }) {
+export function LeaveTraceTrigger({ style, className }: { style?: React.CSSProperties; className?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <BtnPrimary onClick={() => setOpen(true)} style={style}>
+      <BtnPrimary onClick={() => setOpen(true)} style={style} className={className}>
         Leave a trace
       </BtnPrimary>
       {open && <LeaveTraceModal onClose={() => setOpen(false)} />}

@@ -66,18 +66,18 @@ export function OnboardingForm({ defaultUsername }: Props) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+    <div className="onboarding-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <AmbientBg />
       <div style={{ maxWidth: 440, width: '100%', position: 'relative', zIndex: 1, animation: 'fadeUp 0.6s ease both' }}>
 
         {/* Header */}
-        <p style={{ fontFamily: 'var(--sans)', fontSize: 10.5, letterSpacing: '0.2em', color: '#6b6866', textTransform: 'uppercase', marginBottom: 10 }}>
+        <p style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', letterSpacing: '0.2em', color: 'var(--accent-olive-light)', textTransform: 'uppercase', marginBottom: 10 }}>
           Welcome to Traces
         </p>
-        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 34, fontWeight: 300, color: '#f0ece4', marginBottom: 8, lineHeight: 1.2 }}>
-          Choose your name<br />in the dark.
+        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'var(--text-2xl)', fontWeight: 300, color: 'var(--text)', marginBottom: 8, lineHeight: 1.2 }}>
+          Choose your username
         </h1>
-        <p style={{ fontFamily: 'var(--sans)', fontSize: 13, color: '#7a7672', marginBottom: 40, lineHeight: 1.65 }}>
+        <p style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-md)', color: 'var(--muted)', marginBottom: 40, lineHeight: 'var(--leading-relaxed)' }}>
           This becomes your URL. Share it wherever you want people to find you.
         </p>
 
