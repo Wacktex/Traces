@@ -19,6 +19,11 @@ import { buildFingerprint } from '@/services/moderation';
 import { createSupabaseAdminClient } from '@/lib/supabase-admin';
 import type { CreateTraceRequest } from '@/types';
 
+async function getClerkId(): Promise<string | null> {
+  const { userId } = await auth();
+  return userId;
+}
+
 // ─── Helper: get request fingerprint ──────────────────────────────────────────
 async function getFingerprint(): Promise<string> {
   const headersList = headers();
@@ -34,7 +39,7 @@ async function getFingerprint(): Promise<string> {
 export async function actionCreateTrace(
   request: CreateTraceRequest
 ): Promise<{ success: boolean; error?: string; rateLimited?: boolean }> {
-  const { userId: clerkId } = auth();
+  const clerkId = await getClerkId();
   const fingerprint = await getFingerprint();
 
   const result = await createTrace(request, fingerprint, !!clerkId);
@@ -47,13 +52,14 @@ export async function actionReportTrace(params: {
   reason: string;
   detail?: string;
 }) {
-  const { userId: clerkId } = auth();
+  const clerkId = await getClerkId();
   if (!clerkId) throw new Error('Unauthorized');
 
   const user = await getUserByClerkId(clerkId);
   if (!user) throw new Error('User not found');
 
   await reportTrace({ ...params, reporterId: user.id });
+  revalidatePath('/');
   revalidatePath('/dashboard');
 }
 
@@ -62,13 +68,14 @@ export async function actionUpdateProfile(params: {
   username?: string;
   bio?: string;
 }): Promise<{ success: boolean; error?: string }> {
-  const { userId: clerkId } = auth();
+  const clerkId = await getClerkId();
   if (!clerkId) return { success: false, error: 'Unauthorized' };
 
   const result = await updateProfile({ clerkId, ...params });
 
   if (result.success) {
-    revalidatePath('/dashboard');
+    revalidatePath('/');
+  revalidatePath('/dashboard');
     revalidatePath('/settings');
     if (params.username) revalidatePath(`/${params.username}`);
   }
@@ -78,19 +85,20 @@ export async function actionUpdateProfile(params: {
 
 // ─── Mark Notifications Read ───────────────────────────────────────────────────
 export async function actionMarkNotificationsRead() {
-  const { userId: clerkId } = auth();
+  const clerkId = await getClerkId();
   if (!clerkId) return;
 
   const user = await getUserByClerkId(clerkId);
   if (!user) return;
 
   await markAllRead(user.id);
+  revalidatePath('/');
   revalidatePath('/dashboard');
 }
 
 // ─── Block Sender ──────────────────────────────────────────────────────────────
 export async function actionBlockSender(traceId: string) {
-  const { userId: clerkId } = auth();
+  const clerkId = await getClerkId();
   if (!clerkId) throw new Error('Unauthorized');
 
   const user = await getUserByClerkId(clerkId);
@@ -114,16 +122,19 @@ export async function actionBlockSender(traceId: string) {
     blocked_fingerprint: traceRow.sender_fingerprint,
   });
 
+  revalidatePath('/');
   revalidatePath('/dashboard');
 }
 
 // ─── Open trace (record view after lock screen) ─────────────────────────────────
-export async function actionOpenTrace(traceId: string) {
-  const { userId: clerkId } = auth();
-  if (!clerkId) throw new Error('Unauthorized');
+export async function actionOpenTrace(
+  traceId: string
+): Promise<{ success: boolean; error?: string }> {
+  const clerkId = await getClerkId();
+  if (!clerkId) return { success: false, error: 'Please sign in again.' };
 
   const user = await getUserByClerkId(clerkId);
-  if (!user) throw new Error('User not found');
+  if (!user) return { success: false, error: 'Account not found.' };
 
   const db = createSupabaseAdminClient();
   const { data: trace } = await db
@@ -134,16 +145,22 @@ export async function actionOpenTrace(traceId: string) {
     .eq('status', 'delivered')
     .single();
 
-  if (!trace) throw new Error('Trace not found');
+  if (!trace) return { success: false, error: 'This trace is not available.' };
 
-  await recordTraceView(traceId, user.id);
+  const recorded = await recordTraceView(traceId, user.id);
+  if (!recorded.success) {
+    return { success: false, error: recorded.error ?? 'Could not open trace.' };
+  }
+
   revalidatePath(`/traces/${traceId}`);
+  revalidatePath('/');
   revalidatePath('/dashboard');
+  return { success: true };
 }
 
 // ─── Comfort capsule unlock (manual / legacy bad_day) ─────────────────────────
 export async function actionUnlockComfortCapsule(capsuleId: string) {
-  const { userId: clerkId } = auth();
+  const clerkId = await getClerkId();
   if (!clerkId) throw new Error('Unauthorized');
 
   const user = await getUserByClerkId(clerkId);
@@ -176,6 +193,7 @@ export async function actionUnlockComfortCapsule(capsuleId: string) {
     .update({ status: 'delivered' })
     .eq('id', capsuleRow.trace_id);
 
+  revalidatePath('/');
   revalidatePath('/dashboard');
 }
 
@@ -189,14 +207,15 @@ export async function actionCompleteOnboarding(params: {
   username: string;
   bio?: string;
 }): Promise<{ success: boolean; error?: string }> {
-  const { userId: clerkId } = auth();
+  const clerkId = await getClerkId();
   if (!clerkId) return { success: false, error: 'Please sign in to continue.' };
 
   const result = await updateProfile({ clerkId, ...params });
   if (!result.success) return result;
 
+  revalidatePath('/');
   revalidatePath('/dashboard');
   revalidatePath('/onboarding');
   revalidatePath(`/${params.username}`);
-  redirect('/dashboard');
+  redirect('/');
 }

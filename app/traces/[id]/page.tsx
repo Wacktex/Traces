@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default async function TracePage({ params }: Props) {
-  const { userId: clerkId } = auth();
+  const { userId: clerkId } = await auth();
   if (!clerkId) redirect('/sign-in');
 
   const user = await getUserByClerkId(clerkId);
@@ -29,7 +29,7 @@ export default async function TracePage({ params }: Props) {
   const isViewed = await hasViewedTrace(params.id, user.id);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0B0B0C', position: 'relative' }}>
+    <div className="trace-reader-shell" style={{ minHeight: '100vh', background: '#0B0B0C', position: 'relative' }}>
       <Grain />
       <TraceReaderClient trace={trace} username={user.username} initiallyViewed={isViewed} />
     </div>

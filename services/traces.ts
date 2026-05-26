@@ -238,14 +238,24 @@ export async function getTrace(
   return withNormalizedCapsules(trace as TraceWithCapsule);
 }
 
-export async function recordTraceView(traceId: string, viewerId: string): Promise<void> {
+export async function recordTraceView(
+  traceId: string,
+  viewerId: string
+): Promise<{ success: boolean; error?: string }> {
   const db = createSupabaseAdminClient();
   const already = await hasViewedTrace(traceId, viewerId);
-  if (already) return;
-  await db.from('trace_views').insert({
+  if (already) return { success: true };
+
+  const { error } = await db.from('trace_views').insert({
     trace_id: traceId,
     viewer_id: viewerId,
   });
+
+  if (error) {
+    console.error('[recordTraceView]', error);
+    return { success: false, error: error.message };
+  }
+  return { success: true };
 }
 
 // ─── Report Trace ──────────────────────────────────────────────────────────────

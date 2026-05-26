@@ -3,17 +3,27 @@
 import { useCallback, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { getProfileUrl } from '@/lib/profile-url';
+import {
+  instagramShareHint,
+  profileShareMessage,
+  profileShareTitle,
+  shareChannelUrl,
+} from '@/lib/share-links';
+import { track } from '@/lib/analytics';
 
 interface Props {
   username: string;
   compact?: boolean;
+  variant?: 'default' | 'growth';
 }
 
-export function ProfileShare({ username, compact = false }: Props) {
+export function ProfileShare({ username, compact = false, variant = 'default' }: Props) {
   const profileUrl = getProfileUrl(username);
+  const shareMessage = profileShareMessage(username);
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [hint, setHint] = useState<string | null>(null);
 
   useEffect(() => {
     if (!showQr) return;
@@ -38,105 +48,102 @@ export function ProfileShare({ username, compact = false }: Props) {
     try {
       await navigator.clipboard.writeText(profileUrl);
       setCopied(true);
+      setHint(null);
+      track('profile_link_copied', { username });
       setTimeout(() => setCopied(false), 2200);
     } catch {
       setCopied(false);
     }
-  }, [profileUrl]);
+  }, [profileUrl, username]);
 
-  const shareProfile = useCallback(async () => {
+  const copyMessage = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(shareMessage);
+      setHint('Message copied — paste into any chat.');
+      track('profile_message_copied', { username });
+    } catch {
+      setHint('Could not copy. Try again.');
+    }
+  }, [shareMessage, username]);
+
+  const nativeShare = useCallback(async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${username} on Traces`,
-          text: 'Leave an anonymous trace',
+          title: profileShareTitle(username),
+          text: shareMessage,
           url: profileUrl,
         });
+        track('profile_shared', { channel: 'native', username });
         return;
       } catch {
-        /* user cancelled or unsupported */
+        /* cancelled */
       }
     }
     await copyLink();
-  }, [username, profileUrl, copyLink]);
+  }, [username, profileUrl, shareMessage, copyLink]);
 
-  const btn: React.CSSProperties = {
-    background: 'none',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 100,
-    padding: compact ? '8px 16px' : '9px 20px',
-    cursor: 'pointer',
-    color: '#9a9490',
-    fontFamily: 'var(--sans)',
-    fontSize: 11.5,
-    letterSpacing: '0.08em',
-    transition: 'all 0.2s',
-  };
+  const openChannel = useCallback(
+    (channel: 'whatsapp' | 'telegram') => {
+      const url = shareChannelUrl(channel, profileUrl, shareMessage);
+      window.open(url, '_blank', 'noopener,noreferrer');
+      track('profile_shared', { channel, username });
+    },
+    [profileUrl, shareMessage, username]
+  );
+
+  const instagramHint = useCallback(async () => {
+    await copyLink();
+    setHint(instagramShareHint());
+    track('profile_shared', { channel: 'instagram', username });
+  }, [copyLink, username]);
+
+  const isGrowth = variant === 'growth';
 
   return (
-    <div
-      style={{
-        padding: compact ? 0 : '20px 24px',
-        background: compact ? 'transparent' : 'rgba(255,255,255,0.018)',
-        border: compact ? 'none' : '1px solid rgba(255,255,255,0.05)',
-        borderRadius: compact ? 0 : 16,
-      }}
-    >
+    <div className={`profile-share${isGrowth ? ' profile-share--growth' : ''}${compact ? ' profile-share--compact' : ''}`}>
       {!compact && (
         <>
-          <p
-            style={{
-              fontFamily: 'var(--sans)',
-              fontSize: 11,
-              letterSpacing: '0.14em',
-              color: '#6b6866',
-              textTransform: 'uppercase',
-              marginBottom: 8,
-            }}
-          >
-            Share your profile
+          <p className="profile-share__eyebrow type-eyebrow">
+            {isGrowth ? 'Grow your inbox' : 'Share your profile'}
           </p>
-          <p
-            style={{
-              fontFamily: 'var(--sans)',
-              fontSize: 13,
-              color: '#7a7672',
-              marginBottom: 14,
-              wordBreak: 'break-all',
-            }}
-          >
-            {profileUrl.replace(/^https?:\/\//, '')}
+          <p className="profile-share__headline">
+            {isGrowth
+              ? 'Your link is how people find you.'
+              : 'One link for bio, close friends, and DMs.'}
           </p>
+          <p className="profile-share__url">{profileUrl.replace(/^https?:\/\//, '')}</p>
         </>
       )}
 
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <button type="button" onClick={copyLink} style={btn}>
+      <div className="profile-share__actions">
+        <button type="button" className="profile-share__btn profile-share__btn--primary" onClick={copyLink}>
           {copied ? 'Copied' : 'Copy link'}
         </button>
-        <button type="button" onClick={shareProfile} style={btn}>
-          Share
+        <button type="button" className="profile-share__btn" onClick={nativeShare}>
+          Share…
         </button>
-        <button
-          type="button"
-          onClick={() => setShowQr((v) => !v)}
-          style={btn}
-        >
+        <button type="button" className="profile-share__btn" onClick={copyMessage}>
+          Copy message
+        </button>
+        <button type="button" className="profile-share__btn" onClick={() => openChannel('whatsapp')}>
+          WhatsApp
+        </button>
+        <button type="button" className="profile-share__btn" onClick={() => openChannel('telegram')}>
+          Telegram
+        </button>
+        <button type="button" className="profile-share__btn" onClick={instagramHint}>
+          Instagram
+        </button>
+        <button type="button" className="profile-share__btn" onClick={() => setShowQr((v) => !v)}>
           {showQr ? 'Hide QR' : 'QR code'}
         </button>
       </div>
 
+      {hint && <p className="profile-share__hint">{hint}</p>}
+
       {showQr && qrDataUrl && (
-        <div
-          style={{
-            marginTop: 16,
-            padding: 16,
-            background: 'rgba(255,255,255,0.03)',
-            borderRadius: 12,
-            display: 'inline-block',
-            animation: 'fadeUp 0.3s ease both',
-          }}
-        >
+        <div className="profile-share__qr">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={qrDataUrl} alt={`QR code for ${username}`} width={200} height={200} />
         </div>

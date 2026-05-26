@@ -50,7 +50,11 @@ type TraceEvent =
   | { event: 'dashboard_viewed'; props: { unopened_count: number } }
   | { event: 'song_trace_viewed'; props: Record<string, never> }
   | { event: 'report_submitted'; props: { reason: string } }
-  | { event: 'onboarding_completed'; props: Record<string, never> };
+  | { event: 'onboarding_completed'; props: Record<string, never> }
+  | { event: 'profile_link_copied'; props: { username: string } }
+  | { event: 'profile_message_copied'; props: { username: string } }
+  | { event: 'profile_shared'; props: { username: string; channel: string } }
+  | { event: 'story_shared'; props: { mode: string; method: string } };
 
 export function track<T extends TraceEvent>(
   event: T['event'],

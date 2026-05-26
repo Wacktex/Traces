@@ -16,7 +16,7 @@ export default async function OnboardingPage() {
     await syncClerkUser({ clerkId });
     user = await getUserByClerkId(clerkId);
   }
-  if (user?.is_onboarded) redirect('/dashboard');
+  if (user?.is_onboarded) redirect('/');
 
   return (
     <div className="onboarding-page" style={{ minHeight: '100vh', background: 'var(--bg)', position: 'relative' }}>

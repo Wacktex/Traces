@@ -8,3 +8,4 @@ export { ProfileShare } from './ProfileShare';
 export { LegalFooterLinks } from './LegalFooterLinks';
 export { LegalPage, legalHeading, legalBody, legalList } from './LegalPage';
 export { SiteFooter } from './SiteFooter';
+export { BrandLink } from './BrandLink';

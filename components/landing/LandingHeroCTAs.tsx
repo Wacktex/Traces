@@ -4,7 +4,7 @@ import { getUserByClerkId } from '@/services/users';
 import { LeaveTraceTrigger } from '@/components/landing/LeaveTraceModal';
 
 export async function LandingHeroCTAs() {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   return (
     <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -32,8 +32,8 @@ async function AuthenticatedSecondaryCta({ clerkId }: { clerkId: string }) {
   }
 
   return (
-    <BtnGhostLink href="/dashboard" className="btn-touch">
-      Your dashboard
+    <BtnGhostLink href="/" className="btn-touch">
+      Your traces
     </BtnGhostLink>
   );
 }

@@ -79,7 +79,7 @@ export function SettingsClient({ user }: Props) {
     <div style={{ minHeight: '100vh', padding: '80px 20px 60px', position: 'relative' }}>
       <AmbientBg />
 
-      <Link href="/dashboard" style={{
+      <Link href="/" style={{
         position: 'fixed', top: 24, left: 24, zIndex: 50,
         color: '#6b6866', fontFamily: 'var(--sans)', fontSize: 12,
         letterSpacing: '0.08em', textDecoration: 'none', transition: 'color 0.2s',

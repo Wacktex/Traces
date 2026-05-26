@@ -10,6 +10,7 @@
 import { useState }                          from 'react';
 import { useRouter }                         from 'next/navigation';
 import { AmbientBg, SongCard }               from '@/components/shared';
+import { StoryShare }                        from '@/components/traces/StoryShare';
 import { CATEGORIES }                        from '@/components/profile';
 import { actionReportTrace, actionBlockSender, actionOpenTrace } from '@/actions';
 import { track }                             from '@/lib/analytics';
@@ -42,6 +43,7 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
   const router = useRouter();
   const [opened, setOpened]       = useState(initiallyViewed);
   const [opening, setOpening]     = useState(false);
+  const [openError, setOpenError] = useState<string | null>(null);
   const [showActions, setShowActions] = useState(false);
   const [showReport,  setShowReport]  = useState(false);
   const [reporting,   setReporting]   = useState(false);
@@ -81,12 +83,13 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
 
   const handleOpen = async () => {
     setOpening(true);
-    try {
-      await actionOpenTrace(trace.id);
+    setOpenError(null);
+    const result = await actionOpenTrace(trace.id);
+    if (result.success) {
       setOpened(true);
       track('trace_opened', { category: trace.category });
-    } catch {
-      setOpening(false);
+    } else {
+      setOpenError(result.error ?? 'Could not open this trace. Try again.');
     }
     setOpening(false);
   };
@@ -96,7 +99,7 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
     return (
       <div style={{ minHeight: '100vh', background: '#0B0B0C', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 24px', position: 'relative' }}>
         <AmbientBg />
-        <button onClick={() => router.push('/dashboard')} style={{
+        <button type="button" onClick={() => router.push('/')} style={{
           position: 'fixed', top: 24, left: 24, zIndex: 50,
           background: 'none', border: 'none', cursor: 'pointer',
           color: '#6b6866', fontFamily: 'var(--sans)', fontSize: 12, letterSpacing: '0.08em',
@@ -111,14 +114,27 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
           <p style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 15, color: '#7a7672', lineHeight: 1.7, marginBottom: 32 }}>
             Open it when you are ready. The message stays sealed until you do.
           </p>
-          <button onClick={handleOpen} disabled={opening} style={{
-            background: 'rgba(200,191,170,0.12)', border: '1px solid rgba(200,191,170,0.35)',
-            borderRadius: 100, padding: '13px 32px', cursor: 'pointer', color: '#f0ece4',
-            fontFamily: 'var(--sans)', fontSize: 13, letterSpacing: '0.06em',
-            opacity: opening ? 0.6 : 1,
-          }}>
-            {opening ? 'Opening…' : 'Open trace'}
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+            <button type="button" onClick={() => void handleOpen()} disabled={opening} style={{
+              background: 'rgba(200,191,170,0.12)', border: '1px solid rgba(200,191,170,0.35)',
+              borderRadius: 100, padding: '13px 32px', cursor: 'pointer', color: '#f0ece4',
+              fontFamily: 'var(--sans)', fontSize: 13, letterSpacing: '0.06em',
+              opacity: opening ? 0.6 : 1,
+            }}>
+              {opening ? 'Opening…' : 'Open trace'}
+            </button>
+            {openError && (
+              <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#c47070', maxWidth: 320 }}>
+                {openError}
+              </p>
+            )}
+            <StoryShare
+              categoryLabel={cat?.label ?? 'Trace'}
+              categoryIcon={cat?.icon ?? '◌'}
+              content=""
+              opened={false}
+            />
+          </div>
         </div>
       </div>
     );
@@ -138,7 +154,7 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
               ? 'Our team will review it. Thank you for keeping Traces safe.'
               : 'You won\'t receive traces from this sender again.'}
           </p>
-          <button onClick={() => router.push('/dashboard')} style={{
+          <button onClick={() => router.push('/')} style={{
             background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 100,
             padding: '10px 24px', cursor: 'pointer', color: '#f0ece4',
             fontFamily: 'var(--sans)', fontSize: 12, letterSpacing: '0.08em',
@@ -153,7 +169,7 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
       <AmbientBg />
 
       {/* Back */}
-      <button onClick={() => router.push('/dashboard')} style={{
+      <button onClick={() => router.push('/')} style={{
         position: 'fixed', top: 24, left: 24, zIndex: 50,
         background: 'none', border: 'none', cursor: 'pointer',
         color: '#6b6866', fontFamily: 'var(--sans)', fontSize: 12, letterSpacing: '0.08em',
@@ -220,7 +236,14 @@ export function TraceReaderClient({ trace, initiallyViewed }: Props) {
 
         {/* Action row */}
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-          <button onClick={() => router.push('/dashboard')} style={{
+          <StoryShare
+            categoryLabel={cat?.label ?? 'Trace'}
+            categoryIcon={cat?.icon ?? '◌'}
+            content={trace.content}
+            clue={trace.clue}
+            opened
+          />
+          <button onClick={() => router.push('/')} style={{
             background:    'none',
             border:        '1px solid rgba(255,255,255,0.08)',
             borderRadius:  100,

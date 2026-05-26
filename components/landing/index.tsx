@@ -5,8 +5,7 @@
 // ================================================================
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import { AmbientBg, BtnGhostLink } from '@/components/shared';
+import { AmbientBg, BtnGhostLink, BrandLink } from '@/components/shared';
 
 // ── LandingNav.tsx ────────────────────────────────────────────────
 export function LandingNav() {
@@ -27,7 +26,7 @@ export function LandingNav() {
       borderBottom:   scrolled ? '1px solid var(--glass-border)' : 'none',
       transition:     'all 0.4s',
     }}>
-      <span className="nav-brand" style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 300, letterSpacing: '0.15em', color: 'var(--text)' }}>traces</span>
+      <BrandLink style={{ fontSize: 22 }} />
       <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
         <BtnGhostLink href="/sign-in" className="btn-touch" style={{ padding: '10px 22px' }}>
           sign in
@@ -91,7 +90,7 @@ export function LandingHero({ ctas }: { ctas?: React.ReactNode }) {
 
       <div className="landing-hero-content">
         <p className="landing-eyebrow" style={{ marginBottom: 28 }}>Anonymous traces</p>
-        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'var(--text-hero)', fontWeight: 300, lineHeight: 1.15, color: 'var(--text)', marginBottom: 22 }}>
+        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'var(--text-hero)', fontWeight: 300, lineHeight: 'var(--leading-tight)', letterSpacing: 'var(--tracking-display)', color: 'var(--text)', marginBottom: 22 }}>
           Some things are<br /><em style={{ fontStyle: 'italic', color: 'var(--accent-cream)' }}>easier left unsaid.</em>
         </h1>
         <p style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-md)', color: 'var(--muted)', lineHeight: 'var(--leading-relaxed)', fontWeight: 400, marginBottom: 36 }}>

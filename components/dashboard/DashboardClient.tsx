@@ -16,7 +16,8 @@ import { useState, useEffect }              from 'react';
 import Link                                 from 'next/link';
 import { useRouter }                        from 'next/navigation';
 import { useClerk }                         from '@clerk/nextjs';
-import { AmbientBg, ProfileShare }          from '@/components/shared';
+import { AmbientBg, ProfileShare, BrandLink } from '@/components/shared';
+import { LeaveTraceTrigger } from '@/components/landing/LeaveTraceModal';
 import { AIInsightPanel }                   from '@/components/dashboard/AIInsightPanel';
 import { actionMarkNotificationsRead, actionUnlockComfortCapsule } from '@/actions';
 import { formatCapsuleLabel, isComfortCapsule } from '@/lib/delivery';
@@ -41,29 +42,19 @@ function CapsuleCard({ capsule }: { capsule: { id: string; unlock_condition: str
   const labelText = formatCapsuleLabel(capsule.unlock_condition, capsule.unlock_date);
 
   return (
-    <div className="capsule-card" style={{
-      background: 'var(--accent-navy-glass)', border: '1px solid rgba(45,74,62,0.4)',
-      borderRadius: 20, padding: '22px',
-    }}>
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: 15, color: '#4a6080' }}>⧖</span>
-        <span style={{ fontFamily: 'var(--sans)', fontSize: 9.5, letterSpacing: '0.16em', color: '#4a6080', textTransform: 'uppercase' }}>
+    <div className="capsule-card dash-card dash-card--capsule">
+      <div className="dash-card__meta">
+        <span className="dash-card__icon" aria-hidden>⧖</span>
+        <span className="dash-card__label">
           {comfort ? 'Comfort Capsule' : 'Time Capsule'}
         </span>
       </div>
-      <p style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 16, color: '#9ab0c8', marginBottom: 6 }}>
+      <p className="dash-card__teaser">
         Not everything arrives immediately.
       </p>
-      <p style={{ fontFamily: 'var(--sans)', fontSize: 11.5, color: '#4a6080', marginBottom: comfort ? 14 : 0 }}>
-        {labelText}
-      </p>
+      <p className="dash-card__sub">{labelText}</p>
       {comfort && (
-        <button onClick={handleUnlock} disabled={unlocking} style={{
-          background: 'none', border: '1px solid rgba(74,96,128,0.5)', borderRadius: 100,
-          padding: '7px 16px', cursor: 'pointer', color: '#6a8ab0',
-          fontFamily: 'var(--sans)', fontSize: 11, letterSpacing: '0.08em',
-          opacity: unlocking ? 0.5 : 1, transition: 'all 0.2s',
-        }}>
+        <button type="button" onClick={handleUnlock} disabled={unlocking} className="dash-pill-btn dash-pill-btn--navy">
           {unlocking ? 'Opening…' : 'Open when needed'}
         </button>
       )}
@@ -75,15 +66,9 @@ function CapsuleCard({ capsule }: { capsule: { id: string; unlock_condition: str
 function NotifPill({ notif }: { notif: Notification }) {
   const copy = notificationCopy(notif.type);
   return (
-    <div className="notif-pill" style={{
-      padding:    '12px 16px',
-      background: 'var(--accent-olive-glass)',
-      border:     '1px solid var(--accent-olive-border)',
-      borderRadius: 12,
-      animation:  'fadeIn 0.4s ease both',
-    }}>
-      <p style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-base)', color: 'var(--accent-cream)', marginBottom: 2 }}>{copy.summary}</p>
-      {copy.body && <p style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', color: 'var(--muted)' }}>{copy.body}</p>}
+    <div className="notif-pill dash-notif">
+      <p className="dash-notif__title">{copy.summary}</p>
+      {copy.body && <p className="dash-notif__body">{copy.body}</p>}
     </div>
   );
 }
@@ -94,33 +79,19 @@ function TraceCard({ trace }: { trace: TraceWithCapsule }) {
   const locked = !trace.isViewed;
 
   return (
-    <Link href={`/traces/${trace.id}`} style={{ textDecoration: 'none', display: 'block' }}>
-      <div className="trace-card" style={{
-        background:  'var(--glass)',
-        border:      '1px solid var(--glass-border)',
-        borderRadius: 20,
-        padding:     '20px 22px',
-        cursor:      'pointer',
-        transition:  'all 0.3s',
-      }}
-      onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'translateY(-3px)'; el.style.borderColor = 'rgba(255,255,255,0.14)'; }}
-      onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'translateY(0)'; el.style.borderColor = 'rgba(255,255,255,0.08)'; }}
-      onClick={() => track('trace_opened', { category: trace.category })}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <span style={{ fontFamily: 'var(--sans)', fontSize: 9.5, letterSpacing: '0.14em', color: '#6b6866', textTransform: 'uppercase' }}>
+    <Link href={`/traces/${trace.id}`} className="trace-card-link">
+      <div className={`trace-card dash-card dash-card--trace${locked ? ' dash-card--unread' : ''}`}>
+        <div className="dash-card__meta">
+          <span className="dash-card__label">
             {cat?.icon} {cat?.label}
           </span>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            {/* Unread dot */}
-            {locked && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#c8bfaa' }} />}
-            <span style={{ fontFamily: 'var(--sans)', fontSize: 9.5, color: '#4a4846', letterSpacing: '0.08em' }}>
-              {locked ? 'unopened' : 'opened'}
-            </span>
+          <div className="dash-card__status">
+            {locked && <span className="dash-card__dot" aria-hidden />}
+            <span>{locked ? 'unopened' : 'opened'}</span>
           </div>
         </div>
 
-        <p style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 14.5, color: '#9a9490', lineHeight: 1.55, marginBottom: 14 }}>
+        <p className="dash-card__teaser dash-card__teaser--trace">
           {locked
             ? 'Someone left something for you. Open to read it.'
             : trace.clue
@@ -128,13 +99,9 @@ function TraceCard({ trace }: { trace: TraceWithCapsule }) {
             : 'You have opened this trace.'}
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{
-            background: 'none', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 100,
-            padding: '6px 16px', color: '#9a9490',
-            fontFamily: 'var(--sans)', fontSize: 11, letterSpacing: '0.08em', display: 'inline-block',
-          }}>{locked ? 'open trace' : 'read again'}</span>
-          <span style={{ fontFamily: 'var(--sans)', fontSize: 10, color: '#3a3836' }}>
+        <div className="dash-card__footer">
+          <span className="dash-pill-btn">{locked ? 'open trace' : 'read again'}</span>
+          <span className="dash-card__date">
             {new Date(trace.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </span>
         </div>
@@ -156,22 +123,18 @@ function DashboardNav({ username, hasNew }: { username: string; hasNew: boolean 
       background:     'rgba(11,11,12,0.85)', backdropFilter: 'blur(12px)',
       borderBottom:   '1px solid rgba(255,255,255,0.05)',
     }}>
-      <span className="nav-brand" style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 300, letterSpacing: '0.14em', color: 'var(--text)' }}>traces</span>
+      <BrandLink style={{ fontSize: 20 }} />
 
-      <div style={{ display: 'flex', gap: 14, alignItems: 'center', position: 'relative' }}>
-        {/* Notification indicator — subtle, no count */}
+      <div className="dashboard-nav__actions" style={{ position: 'relative' }}>
         {hasNew && (
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#c8bfaa', animation: 'pulse 2s ease infinite' }} />
+          <div className="dashboard-nav__notif" aria-hidden />
         )}
 
-        {/* Share link */}
-        <Link href={`/${username}`} style={{
-          fontFamily: 'var(--sans)', fontSize: 11, color: '#6b6866',
-          textDecoration: 'none', letterSpacing: '0.08em', transition: 'color 0.2s',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.color = '#f0ece4')}
-        onMouseLeave={e => (e.currentTarget.style.color = '#6b6866')}
-        >my profile</Link>
+        <LeaveTraceTrigger variant="nav" />
+
+        <Link href={`/${username}`} className="dashboard-nav__profile">
+          my profile
+        </Link>
 
         {/* Avatar / menu */}
         <button onClick={() => setMenuOpen(v => !v)} style={{
@@ -242,19 +205,21 @@ export function DashboardClient({ user, summary, initialNotifications }: Props) 
 
   const deliveredTraces = summary.latestTraces;
   const sealedCapsules  = summary.sealedCapsules;
+  const isEmpty = deliveredTraces.length === 0 && sealedCapsules.length === 0;
 
   return (
     <>
       <DashboardNav username={user.username} hasNew={hasNew} />
 
-      <div className="dashboard-page" style={{ maxWidth: 640, margin: '0 auto', padding: '88px 20px 80px', position: 'relative', zIndex: 1 }}>
+      <AmbientBg />
+      <div className="dashboard-page">
 
         {/* Greeting */}
-        <div style={{ marginBottom: 40, animation: 'fadeUp 0.5s ease both' }}>
-          <h1 className="dash-greeting" style={{ fontFamily: 'var(--serif)', fontSize: 32, fontWeight: 300, color: 'var(--text)', marginBottom: 10 }}>
+        <div className="dash-hero animate-fade-up">
+          <h1 className="dash-greeting type-display">
             {greeting}, {user.username}.
           </h1>
-          <div className="dash-stat" style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', fontFamily: 'var(--sans)', fontSize: 'var(--text-md)', color: 'var(--muted)' }}>
+          <div className="dash-stat">
             {summary.unopenedCount > 0 && (
               <span>{summary.unopenedCount} {summary.unopenedCount === 1 ? 'trace waits' : 'traces wait'}</span>
             )}
@@ -266,7 +231,7 @@ export function DashboardClient({ user, summary, initialNotifications }: Props) 
               <><span style={{ color: '#3a3836' }}>·</span><span style={{ color: '#c8bfaa' }}>Someone left a song.</span></>
             )}
             {summary.unopenedCount === 0 && summary.capsuleCount === 0 && (
-              <span style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 15, color: '#4a4846' }}>You're all caught up.</span>
+              <span className="dash-stat__calm">You&apos;re all caught up.</span>
             )}
           </div>
         </div>
@@ -283,9 +248,7 @@ export function DashboardClient({ user, summary, initialNotifications }: Props) 
         {/* Traces */}
         {deliveredTraces.length > 0 && (
           <div style={{ marginBottom: 32 }}>
-            <p className="dash-section-label" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', letterSpacing: '0.2em', color: 'var(--subtle)', textTransform: 'uppercase', marginBottom: 14 }}>
-              Waiting for you
-            </p>
+            <p className="dash-section-label type-eyebrow">Waiting for you</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {deliveredTraces.map((trace, i) => (
                 <div key={trace.id} style={{ animation: `fadeUp 0.5s ease ${i * 0.07}s both` }}>
@@ -299,9 +262,7 @@ export function DashboardClient({ user, summary, initialNotifications }: Props) 
         {/* Sealed / scheduled */}
         {sealedCapsules.length > 0 && (
           <div style={{ marginBottom: 32 }}>
-            <p className="dash-section-label" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--text-sm)', letterSpacing: '0.2em', color: 'var(--subtle)', textTransform: 'uppercase', marginBottom: 14 }}>
-              Sealed for later
-            </p>
+            <p className="dash-section-label type-eyebrow">Sealed for later</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {sealedCapsules.map(({ capsule }) => (
                 <CapsuleCard key={capsule.id} capsule={capsule} />
@@ -312,34 +273,35 @@ export function DashboardClient({ user, summary, initialNotifications }: Props) 
 
         {deliveredTraces.length >= 3 && (
           <div style={{ marginBottom: 16 }}>
-            <button onClick={() => setShowInsights(true)} style={{
-              background: 'none', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 100,
-              padding: '9px 20px', cursor: 'pointer', color: '#9a9490',
-              fontFamily: 'var(--sans)', fontSize: 11.5, letterSpacing: '0.08em', transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f0ece4'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.18)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9a9490'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}
-            >Reflect on your traces</button>
+            <button type="button" onClick={() => setShowInsights(true)} className="dash-pill-btn dash-pill-btn--ghost dash-insights-btn">
+              Reflect on your traces
+            </button>
           </div>
         )}
 
-        <div style={{ marginBottom: 28 }}>
-          <ProfileShare username={user.username} />
-        </div>
+        {!isEmpty && (
+          <div style={{ marginBottom: 28 }}>
+            <ProfileShare username={user.username} />
+          </div>
+        )}
 
-        {/* Empty state */}
-        {deliveredTraces.length === 0 && sealedCapsules.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px 0', animation: 'fadeUp 0.5s ease both' }}>
-            <p style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 22, color: '#4a4846', marginBottom: 12 }}>
-              Nothing here yet.
+        {isEmpty && (
+          <div className="dash-empty dash-empty--growth animate-fade-up">
+            <span className="dash-empty__glyph" aria-hidden>✦</span>
+            <p className="dash-empty__title">Your inbox is ready for its first trace.</p>
+            <p className="dash-empty__body">
+              Drop your link where your people already are — bio, close friends, a story sticker.
+              Anonymous confessions, songs, and capsules show up here when they leave one.
             </p>
-            <p style={{ fontFamily: 'var(--sans)', fontSize: 13, color: '#3a3836', marginBottom: 8, lineHeight: 1.6 }}>
-              Share your profile link. Traces and sealed capsules will show up here.
+            <ol className="dash-empty__steps">
+              <li><strong>Copy</strong> your Traces link below</li>
+              <li><strong>Paste</strong> in Instagram, WhatsApp, or your bio</li>
+              <li><strong>Wait</strong> — they write, you open when ready</li>
+            </ol>
+            <ProfileShare username={user.username} variant="growth" />
+            <p className="dash-empty__hint">
+              No feed. No pressure. Just words meant for you.
             </p>
-            <p style={{ fontFamily: 'var(--sans)', fontSize: 11.5, color: '#2a2826', marginBottom: 24 }}>
-              No pressure to check often — they arrive when they are meant to.
-            </p>
-            <ProfileShare username={user.username} compact />
           </div>
         )}
       </div>
